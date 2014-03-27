@@ -32,6 +32,8 @@ FOUNDATION_EXPORT NSString * const HarpyLanguageSpanish;
 - (void)harpyUserDidLaunchAppStore;     // User did click on button that launched App Store.app
 - (void)harpyUserDidSkipVersion;        // User did click on button that skips version update
 - (void)harpyUserDidCancel;             // User did click on button that cancels update dialog
+
+- (void)harpyUpcomingVersionDetected:(NSString *)versionString;   // Triggered when a higher upcoming version string is detected in release note e.g. [Upcoming version:1.3.91]
 @end
 
 typedef NS_ENUM(NSUInteger, HarpyAlertType)

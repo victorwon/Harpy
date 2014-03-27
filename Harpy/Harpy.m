@@ -113,6 +113,35 @@ NSString * const HarpyLanguageSpanish = @"es";
                     [self checkIfDeviceIsSupportedInCurrentAppStoreVersion:currentAppStoreVersion];
                 
                 }
+                
+                // Added by vic, we now check for hint of upcoming update in the "releaseNotes"
+                // NOTE: release updates need to ensure user upgrade to latest version first,
+                // otherwise it could end up being overwritten by the upgraded version, which might not be the latest release.
+                if ([HARPY_APP_STORE_RESULTS count] == 0) {
+                    return; // no result
+                }
+                NSString *note = HARPY_APP_STORE_RESULTS[0][@"releaseNotes"];
+                if (isEmpty(note)) {
+                    return;
+                }
+                NSRange range = [note rangeOfString:@"[Upcoming version:"];
+                if (range.location != NSNotFound) {
+                    NSString *str = [note substringFromIndex:range.location+range.length];
+                    NSArray *splits = [str componentsSeparatedByString:@"]"];
+                    if ([splits count] > 1) {
+                        NSString *nextVersion = [splits objectAtIndex:0];
+                        NSString *lastCheckedVersion = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastCheckedVersion"];
+                        if ( [kHarpyCurrentVersion compare:nextVersion options:NSNumericSearch] == NSOrderedAscending
+                            && (!lastCheckedVersion || [lastCheckedVersion compare:nextVersion options:NSNumericSearch] == NSOrderedAscending)) {
+                            [[NSUserDefaults standardUserDefaults] setObject:nextVersion forKey:@"lastCheckedVersion"];
+                            if ([self.delegate respondsToSelector:@selector(harpyUpcomingVersionDetected:)]) {
+                                [self.delegate harpyUpcomingVersionDetected:nextVersion];
+                            }
+                        }
+                    }
+                }
+                
+                // end of add by vic
             });
         }
     }];
