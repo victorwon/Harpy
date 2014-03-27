@@ -121,7 +121,7 @@ NSString * const HarpyLanguageSpanish = @"es";
                     return; // no result
                 }
                 NSString *note = HARPY_APP_STORE_RESULTS[0][@"releaseNotes"];
-                if (isEmpty(note)) {
+                if (!note || ![note isKindOfClass:[NSString class]]) {
                     return;
                 }
                 NSRange range = [note rangeOfString:@"[Upcoming version:"];
@@ -131,7 +131,8 @@ NSString * const HarpyLanguageSpanish = @"es";
                     if ([splits count] > 1) {
                         NSString *nextVersion = [splits objectAtIndex:0];
                         NSString *lastCheckedVersion = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastCheckedVersion"];
-                        if ( [kHarpyCurrentVersion compare:nextVersion options:NSNumericSearch] == NSOrderedAscending
+                        NSString * cur_version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+                        if ( [cur_version compare:nextVersion options:NSNumericSearch] == NSOrderedAscending
                             && (!lastCheckedVersion || [lastCheckedVersion compare:nextVersion options:NSNumericSearch] == NSOrderedAscending)) {
                             [[NSUserDefaults standardUserDefaults] setObject:nextVersion forKey:@"lastCheckedVersion"];
                             if ([self.delegate respondsToSelector:@selector(harpyUpcomingVersionDetected:)]) {
